@@ -68,9 +68,69 @@ function loadingBigPicture(picture, bigPicture) {
 }
 
 var bigPicture = document.querySelector('.big-picture');
-bigPicture.classList.remove('hidden');
 
 loadingBigPicture(pictureList[0], bigPicture);
 
 document.querySelector('.social__comment-count').classList.add('visually-hidden');
 document.querySelector('.social__comment-loadmore').classList.add('visually-hidden');
+
+var pictureLink = document.querySelectorAll('.picture__link');
+var body = document.body;
+var bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
+
+for (i = 0; i < pictureLink.length; i++) {
+  pictureLink[i].addEventListener('click', function () {
+    bigPicture.classList.remove('hidden');
+    body.classList.add('modal-open');
+  });
+}
+
+bigPictureCancel.addEventListener('click', function () {
+  bigPicture.classList.add('hidden');
+});
+
+var fileUpload = document.querySelector('#upload-file');
+
+fileUpload.addEventListener('change', function () {
+  imgUploadOverlay.classList.remove('hidden');
+});
+
+var imgUploadOverlay = document.querySelector('.img-upload__overlay');
+var imgUploadCancel = imgUploadOverlay.querySelector('#upload-cancel');
+
+imgUploadCancel.addEventListener('click', function () {
+  imgUploadOverlay.classList.add('hidden');
+});
+
+var effectsItems = document.querySelectorAll('.effects__item');
+var effectType = ['none', 'chrome', 'sepia', 'marvin', 'phobos', 'heat'];
+
+function createEffect(EffectSwitch, effectTypeValue) {
+  for (i = 0; i < effectTypeValue.length; i++) {
+    if (EffectSwitch.value === effectTypeValue[i]) {
+      var effect = 'effects__preview--' + effectTypeValue[i];
+    }
+  }
+  return effect;
+}
+
+function deletePreviousEffect(effectTypeValue, image) {
+  for (i = 0; i < effectType.length; i++) {
+    if (image.classList.contains('effects__preview--' + effectType[i])) {
+      image.classList.remove('effects__preview--' + effectType[i]);
+    }
+  }
+}
+
+for (i = 0; i < effectsItems.length; i++) {
+  effectsItems[i].addEventListener('change', function (evt) {
+    var currentEffect = evt.currentTarget;
+    var currentEffectSwitch = currentEffect.querySelector('.effects__radio');
+    var effect = createEffect(currentEffectSwitch, effectType);
+    var imgUploadPreview = document.querySelector('.img-upload__preview');
+    deletePreviousEffect(effectType, imgUploadPreview);
+    imgUploadPreview.classList.add(effect);
+  });
+}
+
+
