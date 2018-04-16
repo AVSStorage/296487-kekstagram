@@ -1,6 +1,5 @@
 'use strict';
 var OBJECTS_AMOUNT = 25;
-var HASHTAG_CODE = 'U+0023';
 
 function createPhoto(i, comments, description) {
   var pictureInfo = {
@@ -53,31 +52,54 @@ for (i = 0; i < OBJECTS_AMOUNT; i++) {
 }
 picturesContainer.appendChild(fragment);
 
-
+// Загрузка лайков,фотографий и комментариев
 function loadingBigPicture(picture, bigPicture) {
-  bigPicture.querySelector('.big-picture__img').src = picture.url;
+  bigPicture.querySelector('.big-picture__img').textContent = '';
+  var currentImg = '<img src="' + picture.url + '" alt="Девушка в купальнике" width="600" height="600">';
+  bigPicture.querySelector('.big-picture__img').insertAdjacentHTML('beforeend', currentImg);
   bigPicture.querySelector('.likes-count').textContent = picture.likes;
   bigPicture.querySelector('.comments-count').textContent = picture.comments.length;
   var socialComments = bigPicture.querySelector('.social__comments');
   socialComments.textContent = '';
   for (i = 0; i < picture.comments.length; i++) {
     var comment = '<li class="social__comment social__comment--text">' +
-       '<img class="social__picture" src="img/avatar-' + generateRandomNumber(1, 6) + '.svg" ' +
-       'alt="Аватар комментатора фотографии" width="35" height="35">' + picture.comments[i] + '</li>';
+      '<img class="social__picture" src="img/avatar-' + generateRandomNumber(1, 6) + '.svg" ' +
+      'alt="Аватар комментатора фотографии" width="35" height="35">' + picture.comments[i] + '</li>';
     socialComments.insertAdjacentHTML('beforeend', comment);
   }
 }
 
 var bigPicture = document.querySelector('.big-picture');
 
+
+document.querySelector('.social__comment-count').classList.add('visually-hidden');
+document.querySelector('.social__comment-loadmore').classList.add('visually-hidden');
+
 var pictureLink = document.querySelectorAll('.picture__link');
 var body = document.body;
 var bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
+// Открытие формы редактирования изображения
+var openPicture = function () {
+  bigPicture.classList.remove('hidden');
+  document.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === 27) {
+      bigPicture.classList.add('hidden');
+    }
+  });
+  body.classList.add('modal-open');
+};
 
+// Открытие изображения по нажатию на миниатюру
 for (i = 0; i < pictureLink.length; i++) {
-  pictureLink[i].addEventListener('click', function () {
-    bigPicture.classList.remove('hidden');
-    body.classList.add('modal-open');
+  pictureLink[i].addEventListener('click', function (evt) {
+    var img = evt.target;
+    for (i = 0; i < pictureList.length; i++) {
+      if (pictureList[i].url === img.getAttribute('src')) {
+        loadingBigPicture(pictureList[i], bigPicture);
+        break;
+      }
+    }
+    openPicture();
   });
 }
 
@@ -85,18 +107,30 @@ bigPictureCancel.addEventListener('click', function () {
   bigPicture.classList.add('hidden');
 });
 
+// Открытие формы загрузки изображения
 var fileUpload = document.querySelector('#upload-file');
 
 fileUpload.addEventListener('change', function () {
   imgUploadOverlay.classList.remove('hidden');
+  document.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === 27) {
+      imgUploadOverlay.classList.add('hidden');
+    }
+  });
+  // Редактирование css-свойства изображения перед загрузкой
+  var resizeControlValue = document.querySelector('.resize__control--value');
+  var resizeValue = Number(resizeControlValue.value.slice(0, -1));
+  changeSizeOfPicture(resizeValue);
 });
-
+// Закрытие формы загрузки изображения
 var imgUploadOverlay = document.querySelector('.img-upload__overlay');
 var imgUploadCancel = imgUploadOverlay.querySelector('#upload-cancel');
 
 imgUploadCancel.addEventListener('click', function () {
   imgUploadOverlay.classList.add('hidden');
 });
+
+// Эффекты
 
 var effectsItems = document.querySelectorAll('.effects__item');
 var effectType = ['none', 'chrome', 'sepia', 'marvin', 'phobos', 'heat'];
@@ -129,46 +163,84 @@ for (i = 0; i < effectsItems.length; i++) {
   });
 }
 
-function searchForSameValues(arr) {
-  var result = [];
+// Хэш-теги
+function unique(arr) {
+  var obj = {};
   for (i = 0; i < arr.length; i++) {
-    var arrValue = arr[i];
-    for (var j = 0; j < result.length; j++) {
-      if (result[j] === arrValue) {
-        return true;
-      }
+    if (obj[arr[i]]) {
+      obj[arr[i]]++;
+    } else {
+      obj[arr[i]] = 1;
+    }
+  }
+  for (var key in obj) {
+    if (obj[key] > 1) {
+      return true;
     }
   }
   return false;
 }
 
+
 var hashtagsContainer = document.querySelector('.text__hashtags');
-hashtagsContainer.addEventListener('input', function () {
-  var textHashtags = hashtagsContainer.value;
-  var hashtags = textHashtags.split(' ' + HASHTAG_CODE);
-  var sameValue = searchForSameValues(hashtags);
+hashtagsContainer.addEventListener('blur', function () {
+  var textHashtags = hashtagsContainer.value.trim().toLowerCase();
+  var hashtags = textHashtags.split(' ');
+  for (i = 0; i < hashtags.length; i++) {
+    if (hashtags[i][0] !== '#') {
+      hashtagsContainer.setCustomValidity('Хэш-тег начинается с символа #');
+      return false;
+    } else if (hashtags[i] === '#') {
+      hashtagsContainer.setCustomValidity('Хеш-тег не может состоять только из одной решётки');
+      return false;
+    } else if (hashtags[i].length > 21) {
+      hashtagsContainer.setCustomValidity('Максимальная длина одного хэш-тега 20 символов');
+      return false;
+    }
+  }
+  hashtagsContainer.setCustomValidity('');
+  var sameValue = unique(hashtags);
   if (sameValue) {
     hashtagsContainer.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
-  }
-  if (hashtags.length > 5) {
+    return false;
+  } else if (hashtags.length > 5) {
     hashtagsContainer.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
+    return false;
   }
-  for (i = 0; i < hashtags.length; i++) {
-    if (hashtags[i][0] !== HASHTAG_CODE) {
-      hashtagsContainer.setCustomValidity('Хэш-тег начинается с символа #');
+  return false;
+});
+
+// Масштаб
+function changeSizeOfPicture(scaleValue) {
+  var imgUploadPreview = document.querySelector('.img-upload__preview').querySelector('img');
+  imgUploadPreview.style.transform = 'scale(' + scaleValue / 100 + ')';
+}
+
+var resizeControlMinus = document.querySelector('.resize__control--minus');
+var resizeControlPlus = document.querySelector('.resize__control--plus');
+
+resizeControlPlus.addEventListener('click', function () {
+  var resizeControlValue = document.querySelector('.resize__control--value');
+  var resizeValue = Number(resizeControlValue.value.slice(0, -1));
+  var resizeMaxValue = Number(resizeControlValue.max.slice(0, -1));
+  if (resizeValue < resizeMaxValue) {
+    resizeValue = resizeValue + 25;
+    if (resizeValue > resizeMaxValue) {
+      resizeValue = resizeMaxValue;
     }
-    if (hashtags[i] === HASHTAG_CODE) {
-      hashtagsContainer.setCustomValidity('Хеш-тег не может состоять только из одной решётки');
-    }
-    if (hashtags[i].length > 21) {
-      hashtagsContainer.setCustomValidity('Максимальная длина одного хэш-тега 20 символов');
-    }
+    resizeControlValue.value = resizeValue + '%';
+    changeSizeOfPicture(resizeValue);
   }
 
 });
 
-
-loadingBigPicture(pictureList[0], bigPicture);
-
-document.querySelector('.social__comment-count').classList.add('visually-hidden');
-document.querySelector('.social__comment-loadmore').classList.add('visually-hidden');
+resizeControlMinus.addEventListener('click', function () {
+  var resizeControlValue = document.querySelector('.resize__control--value');
+  var resizeValue = Number(resizeControlValue.value.slice(0, -1));
+  var resizeMinValue = Number(resizeControlValue.min.slice(0, -1));
+  if (resizeValue > resizeMinValue) {
+    resizeValue = resizeValue - resizeMinValue;
+  }
+  resizeControlValue.value = resizeValue + '%';
+  changeSizeOfPicture(resizeValue);
+});
