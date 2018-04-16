@@ -100,6 +100,12 @@ for (i = 0; i < pictureLink.length; i++) {
       }
     }
     openPicture();
+
+
+for (i = 0; i < pictureLink.length; i++) {
+  pictureLink[i].addEventListener('click', function () {
+    bigPicture.classList.remove('hidden');
+    body.classList.add('modal-open');
   });
 }
 
@@ -108,6 +114,7 @@ bigPictureCancel.addEventListener('click', function () {
 });
 
 // Открытие формы загрузки изображения
+
 var fileUpload = document.querySelector('#upload-file');
 
 fileUpload.addEventListener('change', function () {
@@ -123,6 +130,8 @@ fileUpload.addEventListener('change', function () {
   changeSizeOfPicture(resizeValue);
 });
 // Закрытие формы загрузки изображения
+});
+
 var imgUploadOverlay = document.querySelector('.img-upload__overlay');
 var imgUploadCancel = imgUploadOverlay.querySelector('#upload-cancel');
 
@@ -162,6 +171,7 @@ for (i = 0; i < effectsItems.length; i++) {
     imgUploadPreview.classList.add(effect);
   });
 }
+
 
 // Хэш-теги
 function unique(arr) {
@@ -244,3 +254,4 @@ resizeControlMinus.addEventListener('click', function () {
   resizeControlValue.value = resizeValue + '%';
   changeSizeOfPicture(resizeValue);
 });
+
