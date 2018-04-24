@@ -1,7 +1,10 @@
 'use strict';
+// util.js
 var OBJECTS_AMOUNT = 25;
 var ESC_KEYCOODE = 27;
+// end of util.js
 
+// data.js (Создание данных)
 function createPhoto(i, comments, description) {
   var pictureInfo = {
     url: 'photos/' + (i + 1) + '.jpg',
@@ -35,7 +38,9 @@ var pictureList = [];
 for (var i = 0; i < OBJECTS_AMOUNT; i++) {
   pictureList[i] = createPhoto(i, comments, description);
 }
+// end data.js
 
+// picture.js (Отрисовка миниатюр)
 function loadingPictures(picturesList, photosTemplate) {
   var pictureElement = photosTemplate.cloneNode(true);
   pictureElement.querySelector('img').src = picturesList.url;
@@ -44,16 +49,34 @@ function loadingPictures(picturesList, photosTemplate) {
   return pictureElement;
 }
 
+// Открытие изображения по нажатию на миниатюру
+var pictureLink = document.querySelectorAll('.picture__link');
+
+for (i = 0; i < pictureLink.length; i++) {
+  pictureLink[i].addEventListener('click', function (evt) {
+    var img = evt.target;
+    for (i = 0; i < pictureList.length; i++) {
+      if (pictureList[i].url === img.getAttribute('src')) {
+        loadingBigPicture(pictureList[i], bigPicture);
+        break;
+      }
+    }
+    openPicture();
+  });
+}
+// end of picture.js
+
+// gallery.js
 var picturesContainer = document.querySelector('.pictures');
 var photosTemplate = document.querySelector('#picture').content;
 var fragment = document.createDocumentFragment();
-
 for (i = 0; i < OBJECTS_AMOUNT; i++) {
   fragment.appendChild(loadingPictures(pictureList[i], photosTemplate));
 }
 picturesContainer.appendChild(fragment);
+// end of gallery.js
 
-// Загрузка лайков,фотографий и комментариев
+// preview.js (Загрузка лайков,фотографий и комментариев увеличенной фотографии)
 function loadingBigPicture(picture, bigPicture) {
   bigPicture.querySelector('.big-picture__img').textContent = '';
   var currentImg = '<img src="' + picture.url + '" alt="Девушка в купальнике" width="600" height="600">';
@@ -71,7 +94,6 @@ function loadingBigPicture(picture, bigPicture) {
 }
 
 var bigPicture = document.querySelector('.big-picture');
-
 
 document.querySelector('.social__comment-count').classList.add('visually-hidden');
 document.querySelector('.social__comment-loadmore').classList.add('visually-hidden');
@@ -92,30 +114,17 @@ var openPicture = function () {
   body.classList.add('modal-open');
 };
 
-// Открытие изображения по нажатию на миниатюру
-var pictureLink = document.querySelectorAll('.picture__link');
-
-for (i = 0; i < pictureLink.length; i++) {
-  pictureLink[i].addEventListener('click', function (evt) {
-    var img = evt.target;
-    for (i = 0; i < pictureList.length; i++) {
-      if (pictureList[i].url === img.getAttribute('src')) {
-        loadingBigPicture(pictureList[i], bigPicture);
-        break;
-      }
-    }
-    openPicture();
-  });
-}
-
 bigPictureCancel.addEventListener('click', function () {
   bigPicture.classList.add('hidden');
   body.classList.remove('modal-open');
 });
+// end of preview.js
 
-// Открытие формы загрузки изображения
+// uploading.js (Открытие и закрытие формы загрузки изображения)
 var fileUpload = document.querySelector('#upload-file');
 var minusButtonScale = document.querySelector('.resize__control--minus');
+var resizeControlValue = document.querySelector('.resize__control--value');
+var resizeValue = Number(resizeControlValue.value.slice(0, -1));
 
 fileUpload.addEventListener('change', function () {
   imgUploadOverlay.classList.remove('hidden');
@@ -130,8 +139,6 @@ fileUpload.addEventListener('change', function () {
     }
   });
   // Редактирование css-свойства изображения перед загрузкой
-  var resizeControlValue = document.querySelector('.resize__control--value');
-  var resizeValue = Number(resizeControlValue.value.slice(0, -1));
   changeSizeOfPicture(resizeValue);
 });
 // Закрытие формы загрузки изображения
@@ -141,9 +148,10 @@ var imgUploadCancel = imgUploadOverlay.querySelector('#upload-cancel');
 imgUploadCancel.addEventListener('click', function () {
   imgUploadOverlay.classList.add('hidden');
 });
+// end of uploading.js
 
-// Эффекты
 
+// effects.js (Создание эффекта на изображении)
 var effectsItems = document.querySelectorAll('.effects__item');
 var effectType = [
   {value: 'none',
@@ -184,9 +192,11 @@ var effectType = [
     max: 3,
     typeValue: ''
   }];
+
 var imgUploadScale = document.querySelector('.img-upload__scale');
 imgUploadScale.classList.add('hidden');
-function createEffect(effectSwitch, effectTypeValue) {
+
+function renderEffect(effectSwitch, effectTypeValue) {
   for (i = 0; i < effectTypeValue.length; i++) {
     var effectItem = effectTypeValue[i];
     if (effectSwitch.value === effectItem.value) {
@@ -210,21 +220,34 @@ function deletePreviousEffect(effectTypeValue, image) {
     }
   }
 }
-var imgUploadPreview = document.querySelector('.img-upload__preview');
 
-for (i = 0; i < effectsItems.length; i++) {
-  effectsItems[i].addEventListener('change', function (effectEvt) {
-    var currentEffect = effectEvt.currentTarget;
-    var currentEffectSwitch = currentEffect.querySelector('.effects__radio');
-    var effect = createEffect(currentEffectSwitch, effectType);
-    deletePreviousEffect(effectType, imgUploadPreview);
-    imgUploadPreview.classList.add(effect);
-    scalePin.style.left = 100 + '%';
-    scaleLevel.style.width = 100 + '%';
-  });
+function createEffect(effectEvt) {
+  var currentEffect = effectEvt.currentTarget;
+  var currentEffectSwitch = currentEffect.querySelector('.effects__radio');
+  var effect = renderEffect(currentEffectSwitch, effectType);
+  deletePreviousEffect(effectType, imgUploadPreview);
+  imgUploadPreview.classList.add(effect);
+  var maxPinValue = 100 + '%';
+  scalePin.style.left = maxPinValue;
+  scaleLevel.style.width = maxPinValue;
+  return currentEffectSwitch;
 }
 
-// Хэш-теги валидация
+var imgUploadPreview = document.querySelector('.img-upload__preview');
+for (i = 0; i < effectsItems.length; i++) {
+  effectsItems[i].addEventListener('keydown', function (evt) {
+    if (evt.keyCode === 13) {
+      var effectInput = createEffect(evt);
+      effectInput.checked = true;
+    }
+  });
+  effectsItems[i].addEventListener('change', function (evt) {
+    createEffect(evt);
+  });
+}
+// end of effect.js
+
+// validation.js (Хэш-теги валидация)
 function unique(arr) {
   var obj = {};
   for (i = 0; i < arr.length; i++) {
@@ -241,6 +264,8 @@ function unique(arr) {
   }
   return false;
 }
+
+// Отрисовка рамки в случае ошибки
 var validateCommentError = function () {
   if (!validateComment()) {
     textDescription.style.boxShadow = '0px 0px 10px 3px rgba(255,0,0,1)';
@@ -256,6 +281,7 @@ var validateInputError = function () {
     hashtagsContainer.style.boxShadow = 'none';
   }
 };
+
 var hashtagsContainer = document.querySelector('.text__hashtags');
 
 // Валидация комментариев
@@ -295,9 +321,13 @@ var validateComment = function () {
     return false;
   } return true;
 };
+
 textDescription.addEventListener('change', validateCommentError);
 hashtagsContainer.addEventListener('change', validateInputError);
-// Масштаб
+
+// end of validation.js
+
+// scale.js (Масштаб)
 function changeSizeOfPicture(scaleValue) {
   var scaleImage = imgUploadPreview.querySelector('img');
   scaleImage.style.transform = 'scale(' + scaleValue / 100 + ')';
@@ -307,8 +337,6 @@ var resizeControlMinus = document.querySelector('.resize__control--minus');
 var resizeControlPlus = document.querySelector('.resize__control--plus');
 
 resizeControlPlus.addEventListener('click', function () {
-  var resizeControlValue = document.querySelector('.resize__control--value');
-  var resizeValue = Number(resizeControlValue.value.slice(0, -1));
   var resizeMaxValue = Number(resizeControlValue.max.slice(0, -1));
   if (resizeValue < resizeMaxValue) {
     resizeValue = resizeValue + 25;
@@ -322,8 +350,6 @@ resizeControlPlus.addEventListener('click', function () {
 });
 
 resizeControlMinus.addEventListener('click', function () {
-  var resizeControlValue = document.querySelector('.resize__control--value');
-  var resizeValue = Number(resizeControlValue.value.slice(0, -1));
   var resizeMinValue = Number(resizeControlValue.min.slice(0, -1));
   if (resizeValue > resizeMinValue) {
     resizeValue = resizeValue - resizeMinValue;
@@ -332,7 +358,9 @@ resizeControlMinus.addEventListener('click', function () {
   changeSizeOfPicture(resizeValue);
 });
 
-// Drag & Drop
+// end of scale.js
+
+// moving.js (Drag & Drop)
 
 var scalePin = document.querySelector('.scale__pin');
 var scaleLevel = document.querySelector('.scale__level');
@@ -384,3 +412,4 @@ scalePin.addEventListener('mousedown', function (evt) {
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('mouseup', onMouseUp);
 });
+// end of moving.js
