@@ -2,6 +2,7 @@
 // util.js
 var OBJECTS_AMOUNT = 25;
 var ESC_KEYCOODE = 27;
+var ENTER_KEYCODE = 13;
 // end of util.js
 
 // data.js (Создание данных)
@@ -49,21 +50,6 @@ function loadingPictures(picturesList, photosTemplate) {
   return pictureElement;
 }
 
-// Открытие изображения по нажатию на миниатюру
-var pictureLink = document.querySelectorAll('.picture__link');
-
-for (i = 0; i < pictureLink.length; i++) {
-  pictureLink[i].addEventListener('click', function (evt) {
-    var img = evt.target;
-    for (i = 0; i < pictureList.length; i++) {
-      if (pictureList[i].url === img.getAttribute('src')) {
-        loadingBigPicture(pictureList[i], bigPicture);
-        break;
-      }
-    }
-    openPicture();
-  });
-}
 // end of picture.js
 
 // gallery.js
@@ -100,8 +86,9 @@ document.querySelector('.social__comment-loadmore').classList.add('visually-hidd
 
 var body = document.body;
 var bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
-// Открытие формы редактирования изображения
-var openPicture = function () {
+
+// Открытие изображения по нажатию на миниатюру
+function openPicture() {
   bigPicture.classList.remove('hidden');
   document.addEventListener('keydown', function (evt) {
     if (bigPicture.classList.contains('hidden') === false) {
@@ -112,7 +99,22 @@ var openPicture = function () {
     }
   });
   body.classList.add('modal-open');
-};
+}
+
+var pictureLink = document.querySelectorAll('.picture__link');
+
+for (i = 0; i < pictureLink.length; i++) {
+  pictureLink[i].addEventListener('click', function (evt) {
+    var img = evt.target;
+    for (i = 0; i < pictureList.length; i++) {
+      if (pictureList[i].url === img.getAttribute('src')) {
+        loadingBigPicture(pictureList[i], bigPicture);
+        break;
+      }
+    }
+    openPicture();
+  });
+}
 
 bigPictureCancel.addEventListener('click', function () {
   bigPicture.classList.add('hidden');
@@ -130,7 +132,7 @@ fileUpload.addEventListener('change', function () {
   imgUploadOverlay.classList.remove('hidden');
   minusButtonScale.focus();
   document.addEventListener('keydown', function (evt) {
-    if (fileUpload.classList.contains('hidden') === false) {
+    if (fileUpload.classList.contains('hidden')) {
       if (evt.keyCode === ESC_KEYCOODE) {
         if (evt.target !== textDescription && evt.target !== hashtagsContainer) {
           imgUploadOverlay.classList.add('hidden');
@@ -153,7 +155,7 @@ imgUploadCancel.addEventListener('click', function () {
 
 // effects.js (Создание эффекта на изображении)
 var effectsItems = document.querySelectorAll('.effects__item');
-var effectType = [
+var effectTypes = [
   {value: 'none',
     effect: '',
     min: '',
@@ -196,36 +198,30 @@ var effectType = [
 var imgUploadScale = document.querySelector('.img-upload__scale');
 imgUploadScale.classList.add('hidden');
 
-function renderEffect(effectSwitch, effectTypeValue) {
-  for (i = 0; i < effectTypeValue.length; i++) {
-    var effectItem = effectTypeValue[i];
-    if (effectSwitch.value === effectItem.value) {
-      if (effectItem.value !== 'none') {
-        var effect = 'effects__preview--' + effectItem.value;
-        imgUploadScale.classList.remove('hidden');
-      } else {
-        imgUploadScale.classList.add('hidden');
-      }
+function renderEffect(effectSwitch, effectTypesValue) {
+  for (i = 0; i < effectTypesValue.length; i++) {
+    var effectItem = effectTypesValue[i];
+    if ((effectSwitch.value === effectItem.value) && (effectItem.value !== 'none')) {
+      var effect = 'effects__preview--' + effectItem.value;
+      imgUploadScale.classList.remove('hidden');
+      break;
+    } else {
+      imgUploadScale.classList.add('hidden');
     }
   }
   return effect;
 }
 
-function deletePreviousEffect(effectTypeValue, image) {
-  for (i = 0; i < effectType.length; i++) {
-    var effectItem = effectType[i];
-    if (image.classList.contains('effects__preview--' + effectItem.value)) {
-      image.classList.remove('effects__preview--' + effectItem.value);
-      image.style.filter = '';
-    }
-  }
+function deletePreviousEffect(image) {
+  image.className = 'img-upload__preview';
+  image.style.filter = '';
 }
 
 function createEffect(effectEvt) {
   var currentEffect = effectEvt.currentTarget;
   var currentEffectSwitch = currentEffect.querySelector('.effects__radio');
-  var effect = renderEffect(currentEffectSwitch, effectType);
-  deletePreviousEffect(effectType, imgUploadPreview);
+  var effect = renderEffect(currentEffectSwitch, effectTypes);
+  deletePreviousEffect(imgUploadPreview);
   imgUploadPreview.classList.add(effect);
   var maxPinValue = 100 + '%';
   scalePin.style.left = maxPinValue;
@@ -236,7 +232,7 @@ function createEffect(effectEvt) {
 var imgUploadPreview = document.querySelector('.img-upload__preview');
 for (i = 0; i < effectsItems.length; i++) {
   effectsItems[i].addEventListener('keydown', function (evt) {
-    if (evt.keyCode === 13) {
+    if (evt.keyCode === ENTER_KEYCODE) {
       var effectInput = createEffect(evt);
       effectInput.checked = true;
     }
@@ -381,18 +377,20 @@ scalePin.addEventListener('mousedown', function (evt) {
     startCoords = {
       x: moveEvt.pageX
     };
-    var pinCoords = Math.floor((scalePin.offsetLeft - shift.x) * 100 / scaleLine.clientWidth);
-    if (pinCoords > 100) {
-      pinCoords = 100;
-    } else if (pinCoords < 0) {
+    var maxCoords = scaleLine.clientWidth - scalePin.clientWidth;
+    var pinCoords = scalePin.offsetLeft - shift.x;
+    if (pinCoords > maxCoords) {
+      pinCoords = maxCoords;
+    }
+    if (pinCoords < 0) {
       pinCoords = 0;
     }
-    var styleValue = pinCoords + '%';
+    var styleValue = pinCoords + 'px';
     scalePin.style.left = styleValue;
     scaleLevel.style.width = styleValue;
-    scaleValue.value = pinCoords;
-    for (i = 0; i < effectType.length; i++) {
-      var currentEffect = effectType[i];
+    scaleValue.value = pinCoords * 100 / maxCoords;
+    for (i = 0; i < effectTypes.length; i++) {
+      var currentEffect = effectTypes[i];
       if (imgUploadPreview.classList.contains('effects__preview--' + currentEffect.value)) {
         var effectStep = (currentEffect.max - currentEffect.min) / 100;
         var effectValue = currentEffect.min + Number(scaleValue.value) * effectStep;
