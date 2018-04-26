@@ -41,7 +41,7 @@ for (var i = 0; i < OBJECTS_AMOUNT; i++) {
 }
 // end data.js
 
-// picture.js (Отрисовка миниатюр)
+// gallery.js (Отрисовка миниатюр)
 function loadingPictures(picturesList, photosTemplate) {
   var pictureElement = photosTemplate.cloneNode(true);
   pictureElement.querySelector('img').src = picturesList.url;
@@ -50,9 +50,6 @@ function loadingPictures(picturesList, photosTemplate) {
   return pictureElement;
 }
 
-// end of picture.js
-
-// gallery.js
 var picturesContainer = document.querySelector('.pictures');
 var photosTemplate = document.querySelector('#picture').content;
 var fragment = document.createDocumentFragment();
@@ -377,7 +374,7 @@ scalePin.addEventListener('mousedown', function (evt) {
     startCoords = {
       x: moveEvt.pageX
     };
-    var maxCoords = scaleLine.clientWidth - scalePin.clientWidth;
+    var maxCoords = scaleLine.clientWidth;
     var pinCoords = scalePin.offsetLeft - shift.x;
     if (pinCoords > maxCoords) {
       pinCoords = maxCoords;
