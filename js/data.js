@@ -37,6 +37,7 @@
       fragment.appendChild(renderPicture(pictureList[i]));
     }
     picturesContainer.appendChild(fragment);
+    window.pictureList = pictureList;
   };
   // Обработка ошибок
 

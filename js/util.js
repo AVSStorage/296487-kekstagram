@@ -1,7 +1,7 @@
 'use strict';
 (function () {
   window.util = {
-    OBJECTS_AMOUNT: 25,
+    OBJECTS_AMOUNT: window.pictureList.length,
     KEYCODES: {
       escape: 27,
       enter: 13
