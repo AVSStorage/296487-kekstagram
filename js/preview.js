@@ -13,7 +13,6 @@
     var currentImg = '<img src="' + picture.url + '" alt="Девушка в купальнике" width="600" height="600">';
     bigPicture.querySelector('.big-picture__img').insertAdjacentHTML('beforeend', currentImg);
     bigPicture.querySelector('.likes-count').textContent = picture.likes;
-    bigPicture.querySelector('.comments-count').textContent = picture.comments.length;
     bigPicture.querySelector('.social__caption').textContent = picture.comments[0];
     var socialComments = bigPicture.querySelector('.social__comments');
     socialComments.textContent = '';
@@ -23,10 +22,10 @@
         'alt="Аватар комментатора фотографии" width="35" height="35">' + picture.comments[i] + '</li>';
       socialComments.insertAdjacentHTML('beforeend', comment);
     }
-
     bigPicture.classList.remove('hidden');
     body.classList.add('modal-open');
   };
+
 
   document.addEventListener('keydown', function (evt) {
     if (!bigPicture.classList.contains('hidden')) {

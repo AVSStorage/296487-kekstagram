@@ -33,14 +33,17 @@
     var picturesContainer = document.querySelector('.pictures');
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < window.util.OBJECTS_AMOUNT; i++) {
-      fragment.appendChild(renderPicture(pictureList[i]));
+    function renderPictures() {
+      for (var i = 0; i < pictureList.length; i++) {
+        fragment.appendChild(renderPicture(pictureList[i]));
+      }
+      picturesContainer.appendChild(fragment);
     }
-    picturesContainer.appendChild(fragment);
-    window.pictureList = pictureList;
-  };
-  // Обработка ошибок
 
+    renderPictures();
+
+    // Обработка ошибок
+  };
   var onError = function (errorMessage) {
     var node = document.createElement('div');
     node.style = 'z-index: 100; margin: 20px auto; text-align: center; background-color: red; width: 50%;padding: 15px;';
