@@ -1,23 +1,6 @@
 'use strict';
 // Хэш-теги валидация
 (function () {
-  function unique(arr) {
-    var obj = {};
-    for (var i = 0; i < arr.length; i++) {
-      if (obj[arr[i]]) {
-        obj[arr[i]]++;
-      } else {
-        obj[arr[i]] = 1;
-      }
-    }
-    for (var key in obj) {
-      if (obj[key] > 1) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   // Отрисовка рамки в случае ошибки
   var validateCommentError = function () {
     if (!validateComment()) {
@@ -56,7 +39,7 @@
       }
     }
 
-    var sameValue = unique(hashtags);
+    var sameValue = window.uril.unique(hashtags);
     if (sameValue) {
       hashtagsContainer.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
       return false;
