@@ -15,23 +15,30 @@
   });
 
   // Заггрузка данных с сервера
+  function renderPictures(picturesList, picturesContainer, fragment, photoTemplate) {
+    for (var i = 0; i < picturesList.length; i++) {
+      fragment.appendChild(renderPicture(picturesList[i], photoTemplate));
+    }
+    picturesContainer.appendChild(fragment);
+  }
+
+  function renderPicture(picture, photoTemplate) {
+    var pictureElement = photoTemplate.cloneNode(true);
+    pictureElement.querySelector('img').src = picture.url;
+    pictureElement.querySelector('.picture__stat--likes').textContent = picture.likes;
+    pictureElement.querySelector('.picture__stat--comments').textContent = picture.comments.length;
+    pictureElement.addEventListener('click', function () {
+      window.renderBigPicture(picture);
+    });
+
+    return pictureElement;
+  }
 
   var onLoad = function (pictureList) {
     var photoTemplate = document.querySelector('#picture').content.querySelector('.picture__link');
-    function renderPicture(picture) {
-      var pictureElement = photoTemplate.cloneNode(true);
-      pictureElement.querySelector('img').src = picture.url;
-      pictureElement.querySelector('.picture__stat--likes').textContent = picture.likes;
-      pictureElement.querySelector('.picture__stat--comments').textContent = picture.comments.length;
-      pictureElement.addEventListener('click', function () {
-        window.renderBigPicture(picture);
-      });
-
-      return pictureElement;
-    }
-
     var picturesContainer = document.querySelector('.pictures');
     var fragment = document.createDocumentFragment();
+    renderPictures(pictureList, picturesContainer, fragment, photoTemplate);
 
     var imgFilters = document.querySelector('.img-filters');
     imgFilters.classList.remove('img-filters--inactive');
@@ -104,15 +111,6 @@
         pictureLinks[i].parentNode.removeChild(pictureLinks[i]);
       }
     }
-
-    function renderPictures() {
-      for (i = 0; i < pictureList.length; i++) {
-        fragment.appendChild(renderPicture(pictureList[i]));
-      }
-      picturesContainer.appendChild(fragment);
-    }
-
-    renderPictures();
 
     // Обработка ошибок
   };
