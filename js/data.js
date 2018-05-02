@@ -34,6 +34,19 @@
     return pictureElement;
   }
 
+  function removeLastClick(imgFiltersButtons) {
+    for (var i = 0; i < imgFiltersButtons.length; i++) {
+      imgFiltersButtons[i].className = 'img-filters__button';
+    }
+  }
+
+  function removeFilterImages() {
+    var pictureLinks = document.querySelectorAll('.picture__link');
+    for (var i = 0; i < pictureLinks.length; i++) {
+      pictureLinks[i].parentNode.removeChild(pictureLinks[i]);
+    }
+  }
+
   var onLoad = function (pictureList) {
     var photoTemplate = document.querySelector('#picture').content.querySelector('.picture__link');
     var picturesContainer = document.querySelector('.pictures');
@@ -83,35 +96,21 @@
         }
       }];
 
-    function removeLastClick() {
-      for (var i = 0; i < imgFiltersButtons.length; i++) {
-        imgFiltersButtons[i].className = 'img-filters__button';
-      }
-    }
-
     for (var i = 0; i < imgFiltersButtons.length; i++) {
       imgFiltersButtons[i].addEventListener('click', function (evt) {
         var imgFilterButton = evt.target;
-        removeLastClick();
+        removeLastClick(imgFiltersButtons);
         imgFilterButton.classList.add('img-filters__button--active');
         for (i = 0; i < imgFiltersTypes.length; i++) {
           if (imgFilterButton.id === 'filter-' + imgFiltersTypes[i].value) {
             imgFiltersTypes[i].sortingImg();
             removeFilterImages();
-            window.debounce(renderPictures);
+            window.debounce(renderPictures(pictureList, picturesContainer, fragment, photoTemplate));
             break;
           }
         }
       });
     }
-
-    function removeFilterImages() {
-      var pictureLinks = document.querySelectorAll('.picture__link');
-      for (i = 0; i < pictureLinks.length; i++) {
-        pictureLinks[i].parentNode.removeChild(pictureLinks[i]);
-      }
-    }
-
     // Обработка ошибок
   };
   var onError = function (errorMessage) {
