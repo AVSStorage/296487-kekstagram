@@ -48,7 +48,6 @@
     }];
 
   var imgUploadScale = document.querySelector('.img-upload__scale');
-  imgUploadScale.classList.add('hidden');
 
   function renderEffect(effectSwitch, effectTypesValue) {
     for (i = 0; i < effectTypesValue.length; i++) {
@@ -66,16 +65,16 @@
 
   var imgUploadPreview = document.querySelector('.img-upload__preview');
 
-  function deletePreviousEffect(image) {
+  window.deletePreviousEffect = function (image) {
     image.className = 'img-upload__preview';
     image.style.filter = '';
-  }
+  };
 
   function createEffect(effectEvt) {
     var currentEffect = effectEvt.currentTarget;
     var currentEffectSwitch = currentEffect.querySelector('.effects__radio');
     var effect = renderEffect(currentEffectSwitch, effectTypes);
-    deletePreviousEffect(imgUploadPreview);
+    window.deletePreviousEffect(imgUploadPreview);
     imgUploadPreview.classList.add(effect);
     var maxPinValue = 100 + '%';
     window.scalePin.style.left = maxPinValue;
@@ -94,7 +93,8 @@
       createEffect(evt);
     });
   }
-
+  window.effectsItems = effectsItems;
   window.imgUploadPreview = imgUploadPreview;
   window.effectTypes = effectTypes;
+  window.imgUploadScale = imgUploadScale;
 })();

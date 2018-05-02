@@ -1,32 +1,57 @@
 'use strict';
 // Создание данных
 (function () {
-  function createDataPhoto(i, comments, description) {
-    var pictureInfo = {
-      url: 'photos/' + (i + 1) + '.jpg',
-      likes: window.util.generateRandomNumber(15, 200),
-      comments: generateRandomArray(comments),
-      description: generateRandomArray(description)
-    };
-    return pictureInfo;
-  }
+  // Загрузка введенных данных на сервер
+  var onUpload = function () {
+    window.imgUploadOverlay.classList.add('hidden');
+  };
 
-  function generateRandomArray(array) {
-    var newArray = [];
-    for (var i = 0; i < 2; i++) {
-      newArray[i] = array[window.util.generateRandomNumber(1, 5)];
+  var form = document.querySelector('.img-upload__form');
+  form.addEventListener('submit', function (evt) {
+    window.upload(new FormData(form), onUpload, onError);
+    evt.preventDefault();
+    window.hashtagsContainer.value = '';
+    window.textDescription.value = '';
+  });
+
+  // Заггрузка данных с сервера
+  function renderPictures(picturesList, picturesContainer, fragment, photoTemplate) {
+    for (var i = 0; i < picturesList.length; i++) {
+      fragment.appendChild(renderPicture(picturesList[i], photoTemplate));
     }
-    return newArray;
+    picturesContainer.appendChild(fragment);
   }
 
-  var comments = ['Всё отлично!', 'В целом всё неплохо. Но не всё.', 'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально', 'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.', 'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше', 'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'];
-  var description = ['Тестим новую камеру!', 'Затусили с друзьями на море', 'Как же круто тут кормят', 'Отдыхаем...', 'Цените каждое мгновенье. Цените тех, кто рядом с вами и отгоняйте все сомненья. Не обижайте всех словами......', 'Вот это тачка!'];
+  function renderPicture(picture, photoTemplate) {
+    var pictureElement = photoTemplate.cloneNode(true);
+    pictureElement.querySelector('img').src = picture.url;
+    pictureElement.querySelector('.picture__stat--likes').textContent = picture.likes;
+    pictureElement.querySelector('.picture__stat--comments').textContent = picture.comments.length;
+    pictureElement.addEventListener('click', function () {
+      window.renderBigPicture(picture);
+    });
 
-  var pictureList = [];
-
-  for (var i = 0; i < window.util.OBJECTS_AMOUNT; i++) {
-    pictureList[i] = createDataPhoto(i, comments, description);
+    return pictureElement;
   }
 
-  window.data = pictureList;
+  var onLoad = function (pictureList) {
+    var photoTemplate = document.querySelector('#picture').content.querySelector('.picture__link');
+    var picturesContainer = document.querySelector('.pictures');
+    var fragment = document.createDocumentFragment();
+    renderPictures(pictureList, picturesContainer, fragment, photoTemplate);
+
+    // Обработка ошибок
+  };
+  var onError = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 20px auto; text-align: center; background-color: red; width: 50%;padding: 15px;';
+    node.style.position = 'fixed';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+  window.load(onLoad, onError);
 })();

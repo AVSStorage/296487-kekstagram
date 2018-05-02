@@ -9,6 +9,7 @@
   fileUpload.addEventListener('change', function () {
     imgUploadOverlay.classList.remove('hidden');
     minusButtonScale.focus();
+    resetEffect();
     document.addEventListener('keydown', function (evt) {
       if (!fileUpload.classList.contains('hidden')) {
         if (evt.keyCode === window.util.KEYCODES.escape) {
@@ -29,6 +30,13 @@
     imgUploadOverlay.classList.add('hidden');
   });
 
+  function resetEffect() {
+    var effectInputNone = window.effectsItems[0].querySelector('.effects__radio');
+    window.deletePreviousEffect(window.imgUploadPreview);
+    window.imgUploadScale.classList.add('hidden');
+    effectInputNone.checked = true;
+  }
+  window.imgUploadOverlay = imgUploadOverlay;
   window.resizeControlValue = resizeControlValue;
   window.resizeValue = resizeValue;
 })();

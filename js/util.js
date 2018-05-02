@@ -1,7 +1,6 @@
 'use strict';
 (function () {
   window.util = {
-    OBJECTS_AMOUNT: 25,
     KEYCODES: {
       escape: 27,
       enter: 13
