@@ -44,7 +44,7 @@
     }
   }
 
-  function removeFilterImages() {
+  function removePictures() {
     var pictureLinks = document.querySelectorAll('.picture__link');
     for (var i = 0; i < pictureLinks.length; i++) {
       pictureLinks[i].parentNode.removeChild(pictureLinks[i]);
@@ -57,36 +57,25 @@
     var imgFilters = document.querySelector('.img-filters');
     imgFilters.classList.remove('img-filters--inactive');
     var imgFiltersButtons = imgFilters.querySelectorAll('.img-filters__button');
-    var imgFiltersTypes = [
+    var imgFiltersTypes =
       {
-        value: 'popular',
-        sortingImg: function () {
+        'filter-popular': function () {
           return pictureList.sort(function (first, second) {
             if (first.likes < second.likes) {
               return 1;
             } else if (first.likes > second.likes) {
               return -1;
-            } else {
-              return 0;
-            }
+            } return 0;
           });
-        }
-      },
-      {
-        value: 'new',
-        sortingImg: function () {
+        },
+        'filter-new': function () {
           if (window.util.unique(pictureList)) {
             return pictureList.sort(function () {
               return Math.random() - 0.5;
             });
-          } else {
-            return false;
-          }
-        }
-      },
-      {
-        value: 'discussed',
-        sortingImg: function () {
+          } return false;
+        },
+        'filter-discussed': function () {
           return pictureList.sort(function (firstComment, secondComment) {
             if (firstComment.comments.length < secondComment.comments.length) {
               return 1;
@@ -97,21 +86,16 @@
             }
           });
         }
-      }];
+      };
 
     for (var i = 0; i < imgFiltersButtons.length; i++) {
       imgFiltersButtons[i].addEventListener('click', function (evt) {
         var imgFilterButton = evt.target;
         removeActiveClass(imgFiltersButtons);
         imgFilterButton.classList.add('img-filters__button--active');
-        for (var j = 0; j < imgFiltersTypes.length; j++) {
-          if (imgFilterButton.id === 'filter-' + imgFiltersTypes[j].value) {
-            var sortingPictures = imgFiltersTypes[j].sortingImg();
-            removeFilterImages();
-            window.debounce(renderPictures(sortingPictures));
-            break;
-          }
-        }
+        var sortingPictures = imgFiltersTypes[imgFilterButton.id]();
+        removePictures();
+        window.debounce(renderPictures(sortingPictures));
       });
     }
     // Обработка ошибок

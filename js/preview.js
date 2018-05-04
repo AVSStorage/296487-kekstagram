@@ -5,21 +5,20 @@
   var body = document.body;
   var bigPicture = document.querySelector('.big-picture');
   var bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
+  var loadCommentsButton = document.querySelector('.social__comment-loadmore');
+  var commentsCounterContainer = document.querySelector('.social__comment-count');
   var minCommentsAmount = 5;
-  function renderComments(socialComments, commentsCounter, loadCommentsButton) {
-    if (socialComments.length > commentsCounter) {
-      for (var i = 0; i < commentsCounter; i++) {
-        if (socialComments[i].classList.contains('visually-hidden')) {
-          socialComments[i].classList.remove('visually-hidden');
-        }
-      }
+  function renderComments(comments, commentsCounter) {
+    comments = Array.from(comments);
+    var newComments = comments.slice(0, commentsCounter);
+    for (var i = 0; i < newComments.length; i++) {
+      comments[i].classList.remove('visually-hidden');
+    }
+    if (comments.length > commentsCounter) {
       loadCommentsButton.classList.remove('visually-hidden');
     } else {
-      for (i = 0; i < socialComments.length; i++) {
-        socialComments[i].classList.remove('visually-hidden');
-      }
       loadCommentsButton.classList.add('visually-hidden');
-      return socialComments.length;
+      return newComments.length;
     }
     return commentsCounter;
   }
@@ -28,17 +27,18 @@
       comments[i].classList.add('visually-hidden');
     }
   }
-  function renderCommentsCounter(commentContainer, comments, picture, commentCounter, loadCommentsButton) {
-    commentContainer.textContent = '';
-    commentContainer.insertAdjacentHTML('beforeend', renderComments(comments, commentCounter, loadCommentsButton) + ' из ' + '<span class="comments-count">' + picture.comments.length + '</span> комментариев');
+  function renderCommentsCounter(comments, picture, commentsCounter) {
+    commentsCounterContainer.textContent = '';
+    var commentsCounterText = renderComments(comments, commentsCounter, loadCommentsButton) + ' из ' + '<span class="comments-count">' + picture.comments.length + '</span> комментариев';
+    commentsCounterContainer.insertAdjacentHTML('beforeend', commentsCounterText);
   }
 
-  function loadMoreComments(loadCommentsButton, comments, commentsContainer, picture) {
+  function loadMoreComments(comments, picture) {
     var commentsCounter = 5;
     loadCommentsButton.addEventListener('click', function () {
       commentsCounter = commentsCounter + 5;
-      renderComments(comments, commentsCounter, loadCommentsButton);
-      renderCommentsCounter(commentsContainer, comments, picture, commentsCounter, loadCommentsButton);
+      renderComments(comments, commentsCounter);
+      renderCommentsCounter(comments, picture, commentsCounter);
     });
   }
 
@@ -56,13 +56,11 @@
         'alt="Аватар комментатора фотографии" width="35" height="35">' + picture.comments[i] + '</li>';
       commentsList.insertAdjacentHTML('beforeend', comment);
     }
-    var socialComments = document.querySelectorAll('.social__comment');
-    hidePreviousComments(socialComments);
+    var comments = document.querySelectorAll('.social__comment');
+    hidePreviousComments(comments);
 
-    var loadMoreButton = document.querySelector('.social__comment-loadmore');
-    var socialCommentsCounter = bigPicture.querySelector('.social__comment-count');
-    loadMoreComments(loadMoreButton, socialComments, socialCommentsCounter, picture);
-    renderCommentsCounter(socialCommentsCounter, socialComments, picture, minCommentsAmount, loadMoreButton);
+    loadMoreComments(comments, picture);
+    renderCommentsCounter(comments, picture, minCommentsAmount);
     bigPicture.classList.remove('hidden');
     body.classList.add('modal-open');
   };

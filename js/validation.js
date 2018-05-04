@@ -52,7 +52,7 @@
   var validateComment = function () {
     var newComment = textDescription.value.trim();
     textDescription.setCustomValidity('');
-    if (newComment.length > 141) {
+    if (newComment.length > 140) {
       textDescription.setCustomValidity('Длина комментария не может составлять больше 140 символов');
       return false;
     }
