@@ -10,11 +10,7 @@
   form.addEventListener('submit', function (evt) {
     window.upload(new FormData(form), onUpload, onUploadError);
     evt.preventDefault();
-    // if () {
-    //
-    // }
-    window.hashtagsContainer.value = '';
-    window.textDescription.value = '';
+    form.reset();
   });
 
   // Заггрузка данных с сервера
@@ -22,9 +18,9 @@
   var picturesContainer = document.querySelector('.pictures');
   var fragment = document.createDocumentFragment();
 
-  function sortingImages(pictureList, filterButton) {
+  function sortingImages(pictureList, filter) {
     pictureList = pictureList.slice();
-    switch (filterButton.id) {
+    switch (filter) {
       case 'filter-popular':
         return pictureList.sort(function (first, second) {
           if (first.likes < second.likes) {
@@ -45,11 +41,9 @@
           }
         });
       case 'filter-random' :
-        if (window.util.unique(pictureList)) {
-          return pictureList.sort(function () {
-            return Math.random() - 0.5;
-          });
-        } return false;
+        return pictureList.sort(function () {
+          return Math.random() - 0.5;
+        });
 
       default:
         return pictureList;
@@ -101,7 +95,7 @@
         var imgFilterButton = evt.target;
         removeActiveClass(imgFiltersButtons);
         imgFilterButton.classList.add('img-filters__button--active');
-        var sortedPictures = sortingImages(pictureList, imgFilterButton);
+        var sortedPictures = sortingImages(pictureList, imgFilterButton.id);
         removePictures();
         window.debounce(renderPictures(sortedPictures));
       });
