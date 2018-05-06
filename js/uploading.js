@@ -24,7 +24,6 @@
         }
       }
     });
-    // Редактирование css-свойства изображения перед загрузкой
     window.changeSizeOfPicture(resizeValue);
   });
   // Закрытие формы загрузки изображения
@@ -39,5 +38,3 @@
   window.resizeControlValue = resizeControlValue;
   window.resizeValue = resizeValue;
 })();
-
-//

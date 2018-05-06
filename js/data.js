@@ -82,7 +82,6 @@
     }
   }
 
-
   var onLoad = function (pictureList) {
     renderPictures(pictureList);
 
@@ -90,15 +89,17 @@
     imgFilters.classList.remove('img-filters--inactive');
     var imgFiltersButtons = imgFilters.querySelectorAll('.img-filters__button');
 
+    var onFilterClick = function (evt) {
+      var imgFilterButton = evt.target;
+      removeActiveClass(imgFiltersButtons);
+      imgFilterButton.classList.add('img-filters__button--active');
+      var sortedPictures = sortingImages(pictureList, imgFilterButton.id);
+      removePictures();
+      window.debounce(renderPictures, sortedPictures);
+    };
+
     for (var i = 0; i < imgFiltersButtons.length; i++) {
-      imgFiltersButtons[i].addEventListener('click', function (evt) {
-        var imgFilterButton = evt.target;
-        removeActiveClass(imgFiltersButtons);
-        imgFilterButton.classList.add('img-filters__button--active');
-        var sortedPictures = sortingImages(pictureList, imgFilterButton.id);
-        removePictures();
-        window.debounce(renderPictures(sortedPictures));
-      });
+      imgFiltersButtons[i].addEventListener('click', onFilterClick);
     }
     // Обработка ошибок
   };

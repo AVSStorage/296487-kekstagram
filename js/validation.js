@@ -65,5 +65,3 @@
   window.textDescription = textDescription;
   window.hashtagsContainer = hashtagsContainer;
 })();
-
-// SUBMIT
