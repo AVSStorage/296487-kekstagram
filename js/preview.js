@@ -18,27 +18,24 @@
       loadCommentsButton.classList.remove('visually-hidden');
     } else {
       loadCommentsButton.classList.add('visually-hidden');
-      return newComments.length;
     }
-    return commentsCounter;
   }
   function hidePreviousComments(comments) {
     for (var i = 0; i < comments.length; i++) {
       comments[i].classList.add('visually-hidden');
     }
   }
-  function renderCommentsCounter(comments, picture, commentsCounter) {
+  function renderCommentsCounter(picture) {
     commentsCounterContainer.textContent = '';
-    var commentsCounterText = renderComments(comments, commentsCounter, loadCommentsButton) + ' из ' + '<span class="comments-count">' + picture.comments.length + '</span> комментариев';
+    var commentsCounterText = minCommentsAmount + ' из ' + '<span class="comments-count">' + picture.comments.length + '</span> комментариев';
     commentsCounterContainer.insertAdjacentHTML('beforeend', commentsCounterText);
   }
 
   function loadMoreComments(comments, picture) {
-    var commentsCounter = 5;
     loadCommentsButton.addEventListener('click', function () {
-      commentsCounter = commentsCounter + 5;
-      renderComments(comments, commentsCounter);
-      renderCommentsCounter(comments, picture, commentsCounter);
+      minCommentsAmount = minCommentsAmount + 5;
+      renderComments(comments, minCommentsAmount);
+      renderCommentsCounter(picture);
     });
   }
 
@@ -60,7 +57,7 @@
     hidePreviousComments(comments);
 
     loadMoreComments(comments, picture);
-    renderCommentsCounter(comments, picture, minCommentsAmount);
+    renderCommentsCounter(picture);
     bigPicture.classList.remove('hidden');
     body.classList.add('modal-open');
   };

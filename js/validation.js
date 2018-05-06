@@ -39,7 +39,7 @@
       }
     }
 
-    var sameValue = window.uril.unique(hashtags);
+    var sameValue = window.util.unique(hashtags);
     if (sameValue) {
       hashtagsContainer.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
       return false;
@@ -65,3 +65,5 @@
   window.textDescription = textDescription;
   window.hashtagsContainer = hashtagsContainer;
 })();
+
+// SUBMIT
