@@ -1,23 +1,6 @@
 'use strict';
 // Хэш-теги валидация
 (function () {
-  function unique(arr) {
-    var obj = {};
-    for (var i = 0; i < arr.length; i++) {
-      if (obj[arr[i]]) {
-        obj[arr[i]]++;
-      } else {
-        obj[arr[i]] = 1;
-      }
-    }
-    for (var key in obj) {
-      if (obj[key] > 1) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   // Отрисовка рамки в случае ошибки
   var validateCommentError = function () {
     if (!validateComment()) {
@@ -56,7 +39,7 @@
       }
     }
 
-    var sameValue = unique(hashtags);
+    var sameValue = window.util.unique(hashtags);
     if (sameValue) {
       hashtagsContainer.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
       return false;
@@ -69,7 +52,7 @@
   var validateComment = function () {
     var newComment = textDescription.value.trim();
     textDescription.setCustomValidity('');
-    if (newComment.length > 141) {
+    if (newComment.length > 140) {
       textDescription.setCustomValidity('Длина комментария не может составлять больше 140 символов');
       return false;
     }
@@ -82,3 +65,5 @@
   window.textDescription = textDescription;
   window.hashtagsContainer = hashtagsContainer;
 })();
+
+// SUBMIT

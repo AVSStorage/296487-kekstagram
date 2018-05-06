@@ -5,7 +5,12 @@
   var minusButtonScale = document.querySelector('.resize__control--minus');
   var resizeControlValue = document.querySelector('.resize__control--value');
   var resizeValue = Number(resizeControlValue.value.slice(0, -1));
-
+  function resetEffect() {
+    var effectInputNone = window.effectsItems[0].querySelector('.effects__radio');
+    window.deletePreviousEffect(window.imgUploadPreview);
+    window.imgUploadScale.classList.add('hidden');
+    effectInputNone.checked = true;
+  }
   fileUpload.addEventListener('change', function () {
     imgUploadOverlay.classList.remove('hidden');
     minusButtonScale.focus();
@@ -30,13 +35,9 @@
     imgUploadOverlay.classList.add('hidden');
   });
 
-  function resetEffect() {
-    var effectInputNone = window.effectsItems[0].querySelector('.effects__radio');
-    window.deletePreviousEffect(window.imgUploadPreview);
-    window.imgUploadScale.classList.add('hidden');
-    effectInputNone.checked = true;
-  }
   window.imgUploadOverlay = imgUploadOverlay;
   window.resizeControlValue = resizeControlValue;
   window.resizeValue = resizeValue;
 })();
+
+//

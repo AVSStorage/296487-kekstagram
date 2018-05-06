@@ -33,7 +33,6 @@
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
     processingRequest(xhr, onLoad, onError);
-
     xhr.open('POST', UPLOAD_URL);
     xhr.send(data);
   };
